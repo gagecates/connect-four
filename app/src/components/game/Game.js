@@ -22,12 +22,20 @@ export default function Game() {
     switch (action.type) {
       case 'newGame':
         return {
+          ...state,
+          board: initialGameState.board,
+          gameOver: false,
+          currentPlayer: state.currentPlayer === 1 ? 2 : 1
+        }
+      case 'resetGame':
+        return {
           ...initialGameState,
           board: action.board,
         }
       case 'gameStarted':
         return {
           ...state,
+          board: initialGameState.board,
           gameStarted: true,
         }
       case 'togglePlayer':
@@ -36,18 +44,42 @@ export default function Game() {
           currentPlayer: action.nextPlayer,
           board: action.board,
         }
+      case 'currentPlayer':
+        return {
+          ...state,
+          currentPlayer: action.player,
+        }
       case 'endGame':
         return {
           ...state,
           gameOver: true,
           message: action.message,
           board: action.board,
-          gameStarted: false
         }
       case 'updateMessage':
         return {
           ...state,
           message: action.message,
+        }
+      case 'updatePlayer1Color':
+        return {
+          ...state,
+          player1Color: action.color
+        }
+      case 'updatePlayer2Color':
+        return {
+          ...state,
+          player2Color: action.color
+        }
+      case 'incrementPlayer1Score':
+        return {
+          ...state,
+          player1Score: state.player1Score + 1
+        }
+      case 'incrementPlayer2Score':
+        return {
+          ...state,
+          player2Score: state.player2Score + 1
         }
       default:
         throw Error(`Action "${action.type}" is not a valid action.`)
@@ -59,7 +91,9 @@ export default function Game() {
     player1Color: null,
     player2: 2,
     player2Color: null,
-    currentPlayer: 1,
+    player1Score: 0,
+    player2Score: 0,
+    currentPlayer: null,
     board: [
       [null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null],
@@ -87,7 +121,7 @@ export default function Game() {
       //check if cell is taken by starting at the bottom row and working up
       for (let r = 5; r >= 0; r--) {
         if (!board[r][c]) {
-          board[r][c] = currentPlayer
+          board[r][c] = gameState.currentPlayer
           break
         }
       }
@@ -96,14 +130,20 @@ export default function Game() {
       if (result === gameState.player1) {
         dispatchGameState({
           type: 'endGame',
-          message: 'Player1 (red) wins!',
+          message: `Player 1 (${gameState.player1Color}) wins!`,
           board,
+        })
+        dispatchGameState({
+          type: 'incrementPlayer1Score',
         })
       } else if (result === gameState.player2) {
         dispatchGameState({
           type: 'endGame',
-          message: 'Player2 (yellow) wins!',
+          message: `Player 2 (${gameState.player2Color}) wins!`,
           board,
+        })
+        dispatchGameState({
+          type: 'incrementPlayer2Score',
         })
       } else if (result === 'draw') {
         dispatchGameState({
@@ -113,7 +153,7 @@ export default function Game() {
         })
       } else {
         const nextPlayer =
-          currentPlayer === gameState.player1
+          gameState.currentPlayer === gameState.player1
             ? gameState.player2
             : gameState.player1
 
@@ -130,34 +170,32 @@ export default function Game() {
   }
 
   const handleGameStart = () => {
-    console.log(gameState)
     dispatchGameState({
       type: 'gameStarted',
       gameStarted: true,
-      currentPlayer: currentPlayer
     })
-    console.log(gameState)
   }
+  console.log(gameState)
 
 
   return (
     <>
-      {!gameState.gameStarted && (
+      {!gameState.gameStarted && !gameState.gameOver && (
         <>
           <Typography variant="h5" gutterBottom component="span">Who wants to go first?</Typography>
           <div className='flex-center'>
             <ToggleButtonGroup
               color="primary"
-              value={currentPlayer}
+              value={gameState.currentPlayer}
               exclusive
-              onChange={(e, newAlignment) => setCurrentPlayer(newAlignment)}
+              onChange={(e, newAlignment) => dispatchGameState({type: 'currentPlayer', player: newAlignment})}
               sx={{ marginBottom: 5 }}
             >
               <ToggleButton value={1}>Player 1</ToggleButton>
               <ToggleButton value={2}>Player 2</ToggleButton>
             </ToggleButtonGroup>
           </div>
-          {currentPlayer && (
+          {gameState.currentPlayer && (
             <>
               <Typography variant="h5" gutterBottom component="span">Players pick your colors</Typography>
               <div className="flex-row">
@@ -167,12 +205,12 @@ export default function Game() {
                     <Select
                       labelId="select-label"
                       id="simple-select"
-                      value={player1Color}
+                      value={gameState.player1Color}
                       label="Player 1"
-                      onChange={(e) => setPlayer1Color(e.target.value)}
+                      onChange={(e) => dispatchGameState({type: 'updatePlayer1Color', color: e.target.value})}
                     >
-                      {player2Color ? (
-                        colorOptions.filter(color => color.name !== player2Color).map((color, index) => (
+                      {gameState.player2Color ? (
+                        colorOptions.filter(color => color.name !== gameState.player2Color).map((color, index) => (
                           <MenuItem value={color.value}>{color.name}</MenuItem>
                         ))
                       )
@@ -190,12 +228,12 @@ export default function Game() {
                     <Select
                       labelId="select-label"
                       id="simple-select"
-                      value={player2Color}
+                      value={gameState.player2Color}
                       label="Player 2"
-                      onChange={(e) => setPlayer2Color(e.target.value)}
+                      onChange={(e) => dispatchGameState({type: 'updatePlayer2Color', color: e.target.value})}
                     >
-                      {player1Color ? (
-                        colorOptions.filter(color => color.name !== player1Color).map((color, index) => (
+                      {gameState.player1Color ? (
+                        colorOptions.filter(color => color.name !== gameState.player1Color).map((color, index) => (
                           <MenuItem value={color.value}>{color.name}</MenuItem>
                         ))
                       )
@@ -212,8 +250,18 @@ export default function Game() {
           )}
         </>
       )}
-      {gameState.gameOver && gameState.message}
-      {!gameState.gameStarted && player1Color && player2Color && (
+      {gameState.gameOver && (
+        <>
+          <Typography variant="h5" gutterBottom component="span">{gameState.message}</Typography>
+          <Button
+            onClick={() => dispatchGameState({type: 'newGame'})}
+            size='large' sx={{ margin: 1 }}
+            variant='contained'>
+              Play again?
+          </Button>
+        </>
+      )}
+      {!gameState.gameStarted && !gameState.gameOver && gameState.player1Color && gameState.player2Color && (
         <Button
           onClick={handleGameStart}
           size='large' sx={{ margin: 4 }}
@@ -222,21 +270,46 @@ export default function Game() {
       )}
       {gameState.gameStarted && (
         <>
-          <Typography variant="h5" gutterBottom component="span">Player {currentPlayer}, your turn!</Typography>
+          {!gameState.gameOver && (
+            <Typography variant="h5" gutterBottom component="span">Player {gameState.currentPlayer}, your turn!</Typography>
+          )}
           <div className="board-container fade-in-board flex-column">
             <table style={{ backgroundColor: 'white'}}>
               <tbody>
-                <DropRow row={dropRow} play={play} playerColor={currentPlayer === 1 ? player1Color : player2Color}/>
+                <DropRow
+                  row={dropRow}
+                  play={play}
+                  playerColor={gameState.currentPlayer === 1 ? gameState.player1Color : gameState.player2Color}
+                  gameOver={gameState.gameOver}
+                />
               </tbody>
             </table>
             <table style={{ backgroundColor: 'black'}}>
               <tbody>
-                {gameState.board.map((row, i) => (
-                  <Row key={i} row={row} colors={[player1Color, player2Color]}/>
+                {gameState.board && gameState.board.map((row, i) => (
+                  <Row key={i} row={row} colors={[gameState.player1Color, gameState.player2Color]}/>
                 ))}
               </tbody>
             </table>
             <div className='board-base'/>
+            <div className="flex-row">
+              <div className="score-box">
+                <Typography variant="h5" gutterBottom component="div">Player 1</Typography>
+                <Typography variant="h5" gutterBottom component="div">{gameState.player1Score}</Typography>
+              </div>
+              <div className="score-box">
+                <Typography variant="h5" gutterBottom component="div">Player 2</Typography>
+                <Typography variant="h5" gutterBottom component="div">{gameState.player2Score}</Typography>
+              </div>
+            </div>
+            {gameState.player1Score + gameState.player2Score >= 1 && (
+              <Button
+                onClick={() => dispatchGameState({type: 'resetGame'})}
+                size='large' sx={{ margin: 1 }}
+                variant='contained'>
+                  Start over
+              </Button>
+            )}
           </div>
         </>
       )}

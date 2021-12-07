@@ -10,11 +10,11 @@
 }
 
 .fade-in-board {
-  animation: fadeIn 5s;
-  -webkit-animation: fadeIn 5s;
-  -moz-animation: fadeIn 5s;
-  -o-animation: fadeIn 5s;
-  -ms-animation: fadeIn 5s;
+  animation: fadeIn 3s;
+  -webkit-animation: fadeIn 3s;
+  -moz-animation: fadeIn 3s;
+  -o-animation: fadeIn 3s;
+  -ms-animation: fadeIn 3s;
 }
 @keyframes fadeIn {
   0% {opacity:0;}
@@ -41,11 +41,6 @@
   100% {opacity:1;}
 }
 
-
-.cursor {
-  cursor: pointer;
-}
-
 .gameCell {
   display: flex;
   justify-content: center;
@@ -63,6 +58,11 @@
   width: 70px;
   background-color: #ffff;
   cursor: pointer;
+}
+
+.disabled {
+  display: none;
+  cursor: none !important;
 }
 
 .greenCircle,
@@ -103,4 +103,8 @@
 .blueCircle {
   background-color: rgb(31, 105, 243);
   transition: background-color 0.5s;
+}
+
+.score-box {
+  margin: 20px;
 }
