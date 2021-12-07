@@ -1,0 +1,106 @@
+.board-container {
+  position: absolute;
+  top: 25vh;
+}
+
+.board-base {
+  background-color: black;
+  height: 10px;
+  width: 620px;
+}
+
+.fade-in-board {
+  animation: fadeIn 5s;
+  -webkit-animation: fadeIn 5s;
+  -moz-animation: fadeIn 5s;
+  -o-animation: fadeIn 5s;
+  -ms-animation: fadeIn 5s;
+}
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+
+.cursor {
+  cursor: pointer;
+}
+
+.gameCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+  width: 70px;
+  background-color: #7047a5;
+}
+
+.dropCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+  width: 70px;
+  background-color: #ffff;
+  cursor: pointer;
+}
+
+.greenCircle,
+.blueCircle,
+.blackCircle,
+.whiteCircle,
+.redCircle,
+.yellowCircle {
+  height: 60px;
+  width: 60px;
+  border-radius: 100px;
+}
+
+.whiteCircle {
+  background-color: #fff;
+}
+
+.redCircle {
+  background-color: rgb(251, 42, 42);
+  transition: background-color 0.5s;
+}
+
+.yellowCircle {
+  background-color: rgb(243, 239, 20);
+  transition: background-color 0.5s;
+}
+
+.greenCircle {
+  background-color: rgb(91, 226, 37);
+  transition: background-color 0.5s;
+}
+
+.blackCircle {
+  background-color: rgb(10, 10, 10);
+  transition: background-color 0.5s;
+}
+
+.blueCircle {
+  background-color: rgb(31, 105, 243);
+  transition: background-color 0.5s;
+}
