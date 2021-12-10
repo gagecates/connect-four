@@ -1,6 +1,9 @@
 # connect-four
 
 ## Welcome to my connect 4 game!
+![Alt text](/app/public/connect4-img.png?raw=true "Title")
+![Alt text](/app/public/board.png?raw=true "Board")
+
 
 This app was created with React.js and Material UI
 
