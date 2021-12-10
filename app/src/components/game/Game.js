@@ -309,7 +309,8 @@ export default function Game() {
               <Button
                 onClick={() => dispatchGameState({type: 'resetGame'})}
                 size='large' sx={{ margin: 1 }}
-                variant='contained'>
+                variant='contained'
+              >
                   Start over
               </Button>
             )}
