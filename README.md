@@ -11,7 +11,7 @@ This app was created with React.js and Material UI
 To run this app locally:
 
 1. Clone the repo to your local machine.
-2. Navigate to the src directory
+2. Navigate to the app directory
 3. Install dependencies by entering
 ```
   npm i
