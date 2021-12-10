@@ -14,12 +14,10 @@ export default function Row({ row, colors }){
 
 const Cell = ({ value, columnIndex, colors }) => {
   let color = 'whiteCircle'
-  console.log(colors)
 
   if (value === 1) { color = colors[0]}
   else if (value === 2) { color = colors[1]}
 
-  console.log(value, color)
   return (
     <td>
       <Box

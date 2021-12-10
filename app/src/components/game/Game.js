@@ -11,7 +11,7 @@ import Select from '@mui/material/Select'
 import { useReducer } from 'react'
 import Row from '../row/Row'
 import DropRow from '../row/DropRow'
-import { checkForWin, deepCloneBoard, generateNewBoard } from '../../utils/gameUtils'
+import { checkForWin, deepCloneBoard, deepCloneDropRow } from '../../utils/gameUtils'
 import { colorOptions } from '../../utils/colorOptions'
 import './Game.css'
 
@@ -102,30 +102,29 @@ export default function Game() {
       [null, null, null, null, null, null, null],
       [null, null, null, null, null, null, null],
     ],
+    dropRow: [null, null, null, null, null, null, null],
     gameStarted: false,
     gameOver: false,
     message: '',
   }
-
-  // first row used for dropping discs
-  const dropRow = [0, 0 , 0, 0, 0, 0, 0]
 
   const [gameState, dispatchGameState] = useReducer(
     gameReducer,
     initialGameState
   )
 
-  const play = (c) => {
+  const play = (col) => {
     if (!gameState.gameOver) {
       let board = deepCloneBoard(gameState.board)
+      let dropRow = deepCloneDropRow(gameState.dropRow)
       //check if cell is taken by starting at the bottom row and working up
-      for (let r = 5; r >= 0; r--) {
-        if (!board[r][c]) {
-          board[r][c] = gameState.currentPlayer
+      for (let row = 5; row >= 0; row--) {
+        if (!board[row][col]) {
+          board[row][col] = gameState.currentPlayer
+          console.log('breaking')
           break
         }
       }
-      // Check status of board
       let result = checkForWin(board)
       if (result === gameState.player1) {
         dispatchGameState({
@@ -148,7 +147,7 @@ export default function Game() {
       } else if (result === 'draw') {
         dispatchGameState({
           type: 'endGame',
-          message: 'Draw Game!',
+          message: 'Dang, a Tie!!!',
           board,
         })
       } else {
@@ -157,10 +156,9 @@ export default function Game() {
             ? gameState.player2
             : gameState.player1
 
-        dispatchGameState({ type: 'togglePlayer', nextPlayer, board })
+        dispatchGameState({ type: 'togglePlayer', nextPlayer, board, dropRow })
       }
     }
-    // it's gameover and a user clicked a cell
     else {
       dispatchGameState({
         type: 'updateMessage',
@@ -175,8 +173,6 @@ export default function Game() {
       gameStarted: true,
     })
   }
-  console.log(gameState)
-
 
   return (
     <>
@@ -205,18 +201,18 @@ export default function Game() {
                     <Select
                       labelId="select-label"
                       id="simple-select"
-                      value={gameState.player1Color}
+                      value={gameState.player1Color || ''}
                       label="Player 1"
                       onChange={(e) => dispatchGameState({type: 'updatePlayer1Color', color: e.target.value})}
                     >
                       {gameState.player2Color ? (
                         colorOptions.filter(color => color.name !== gameState.player2Color).map((color, index) => (
-                          <MenuItem value={color.value}>{color.name}</MenuItem>
+                          <MenuItem key={index} value={color.value}>{color.name}</MenuItem>
                         ))
                       )
                       :
                       colorOptions.map((color, index) => (
-                        <MenuItem value={color.value}>{color.name}</MenuItem>
+                        <MenuItem key={index} value={color.value}>{color.name}</MenuItem>
                       ))
                       }
                     </Select>
@@ -228,18 +224,18 @@ export default function Game() {
                     <Select
                       labelId="select-label"
                       id="simple-select"
-                      value={gameState.player2Color}
+                      value={gameState.player2Color || ''}
                       label="Player 2"
                       onChange={(e) => dispatchGameState({type: 'updatePlayer2Color', color: e.target.value})}
                     >
                       {gameState.player1Color ? (
                         colorOptions.filter(color => color.name !== gameState.player1Color).map((color, index) => (
-                          <MenuItem value={color.value}>{color.name}</MenuItem>
+                          <MenuItem key={index} value={color.value}>{color.name}</MenuItem>
                         ))
                       )
                       :
                       colorOptions.map((color, index) => (
-                        <MenuItem value={color.value}>{color.name}</MenuItem>
+                        <MenuItem key={index} value={color.value}>{color.name}</MenuItem>
                       ))
                       }
                     </Select>
@@ -255,7 +251,7 @@ export default function Game() {
           <Typography variant="h5" gutterBottom component="span">{gameState.message}</Typography>
           <Button
             onClick={() => dispatchGameState({type: 'newGame'})}
-            size='large' sx={{ margin: 1 }}
+            size='large'
             variant='contained'>
               Play again?
           </Button>
@@ -271,16 +267,23 @@ export default function Game() {
       {gameState.gameStarted && (
         <>
           {!gameState.gameOver && (
-            <Typography variant="h5" gutterBottom component="span">Player {gameState.currentPlayer}, your turn!</Typography>
+            <Typography
+              variant="h5"
+              gutterBottom
+              component="span"
+            >
+              Player {gameState.currentPlayer}, your turn!
+            </Typography>
           )}
           <div className="board-container fade-in-board flex-column">
-            <table style={{ backgroundColor: 'white'}}>
+            <table style={{ backgroundColor: 'white', marginTop: 10}}>
               <tbody>
                 <DropRow
-                  row={dropRow}
+                  row={gameState.dropRow}
                   play={play}
                   playerColor={gameState.currentPlayer === 1 ? gameState.player1Color : gameState.player2Color}
                   gameOver={gameState.gameOver}
+                  board={gameState.board}
                 />
               </tbody>
             </table>

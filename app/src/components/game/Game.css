@@ -61,7 +61,7 @@
 }
 
 .disabled {
-  display: none;
+  display: none !important;
   cursor: none !important;
 }
 
