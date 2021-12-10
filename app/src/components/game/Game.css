@@ -116,12 +116,12 @@
   .whiteCircle,
   .redCircle,
   .yellowCircle {
-    height: 37px;
-    width: 37px;
+    height: 35px;
+    width: 35px;
   }
   .gameCell, .dropCell {
-    height: 47px;
-    width: 47px;
+    height: 45px;
+    width: 45px;
   }
   .board-base {
     height: 10px;
